@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="VaultType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="VaultService_ASPNETCORE_ENVIRONMENT" DefaultValue="" />
+    <Parameter Name="VaultService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="VaultService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="VaultService_TargetReplicaSetSize" DefaultValue="3" />
+  </Parameters>
+  <!-- Importieren Sie das "ServiceManifest" aus dem "ServicePackage". Der "ServiceManifestName" und die "ServiceManifestVersion" 
+       sollten mit den Attributen "Name" und "Version" des ServiceManifest-Elements übereinstimmen, die 
+       in der Datei "ServiceManifest.xml" definiert werden. -->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="VaultServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+    <EnvironmentOverrides CodePackageRef="code">
+      <EnvironmentVariable Name="ASPNETCORE_ENVIRONMENT" Value="[VaultService_ASPNETCORE_ENVIRONMENT]" />
+    </EnvironmentOverrides>
+  </ServiceManifestImport>
+  <DefaultServices>
+    <!-- Der Abschnitt unten erstellt Instanzen von Diensttypen, wenn eine Instanz dieses 
+       Anwendungstyps erstellt wird. Sie können auch mindestens eine Instanz von Diensttyp mithilfe des 
+       ServiceFabric-PowerShell-Moduls erstellen. 
+        
+       Das unten aufgeführte Attribut "ServiceTypeName" muss mit dem Namen übereinstimmen, der in der importierten Datei "ServiceManifest.xml"  definiert wird. -->
+    <Service Name="VaultService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="VaultServiceType" TargetReplicaSetSize="[VaultService_TargetReplicaSetSize]" MinReplicaSetSize="[VaultService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[VaultService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+  </DefaultServices>
+</ApplicationManifest>

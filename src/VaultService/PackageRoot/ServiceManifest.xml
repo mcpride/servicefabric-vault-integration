@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceManifest Name="VaultServicePkg"
+                 Version="1.0.0"
+                 xmlns="http://schemas.microsoft.com/2011/01/fabric"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ServiceTypes>
+    <!-- Dies ist der Name Ihres "ServiceType". 
+         Dieser Name muss mit der Zeichenfolge übereinstimmen, die im RegisterServiceType-Aufruf in "Program.cs" verwendet wird. -->
+    <StatefulServiceType ServiceTypeName="VaultServiceType"  HasPersistedState="true" />
+  </ServiceTypes>
+
+  <!-- Das Codepaket ist Ihre ausführbare Dienstdatei. -->
+  <CodePackage Name="Code" Version="1.0.0">
+    <EntryPoint>
+      <ExeHost>
+        <Program>VaultService.exe</Program>
+        <WorkingFolder>CodePackage</WorkingFolder>
+      </ExeHost>
+    </EntryPoint>
+    <EnvironmentVariables>
+      <EnvironmentVariable Name="ASPNETCORE_ENVIRONMENT" Value=""/>
+    </EnvironmentVariables>
+  </CodePackage>
+
+  <!-- Das Konfigurationspaket stellt den Inhalt des Konfigurationsverzeichnisses unter "PackageRoot" dar, das eine 
+         unabhängig aktualisierbare und mit einer Versionsangabe versehene Sammlung benutzerdefinierter Konfigurationseinstellungen für Ihren Dienst enthält. -->
+  <ConfigPackage Name="Config" Version="1.0.0" />
+
+</ServiceManifest>
