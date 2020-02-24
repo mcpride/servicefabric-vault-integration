@@ -1,54 +1,57 @@
-using System;
 using System.Collections.Generic;
 using System.Fabric;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using Microsoft.ServiceFabric.Data;
+using VaultService.Core;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace VaultService
 {
-    /// <summary>
-    /// "FabricRuntime" erstellt eine Instanz dieser Klasse für jede Diensttypinstanz. 
-    /// </summary>
     internal sealed class VaultService : StatefulService
     {
+        private readonly IServiceWebHost _host;
+        private readonly IList<IServiceCommunicationListener> _serviceCommunicationListeners = new List<IServiceCommunicationListener>();
+
         public VaultService(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+            var builder = new KestrelBasedServiceWebHostBuilder(Context, "StorageEndpoint",
+                services =>
+                {
+                    services.AddSingleton(StateManager);
+                });
+            _host = builder.Build();
+        }
 
-        /// <summary>
-        /// Optionale Außerkraftsetzung zum Erstellen von Listenern (z. B. TCP, HTTP) für diese Dienstinstanz.
-        /// </summary>
-        /// <returns>Die Sammlung von Listenern.</returns>
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceReplicaListener[]
-            {
-                new ServiceReplicaListener(serviceContext =>
-                    new KestrelCommunicationListener(serviceContext, (url, listener) =>
-                    {
-                        ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
+            _serviceCommunicationListeners.Clear();
+            var listeners = new List<ServiceReplicaListener>();
 
-                        return new WebHostBuilder()
-                                    .UseKestrel()
-                                    .ConfigureServices(
-                                        services => services
-                                            .AddSingleton<StatefulServiceContext>(serviceContext)
-                                            .AddSingleton<IReliableStateManager>(this.StateManager))
-                                    .UseContentRoot(Directory.GetCurrentDirectory())
-                                    .UseStartup<Startup>()
-                                    .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
-                                    .UseUrls(url)
-                                    .Build();
-                    }))
-            };
+            listeners.Add(new ServiceReplicaListener(context => _host.Listener, _host.EndpointName));
+
+            var listenerFactories = _host.Services.GetServices<IServiceCommunicationListenerFactory>();
+            foreach (var listenerFactory in listenerFactories)
+            {
+                var listener = listenerFactory.Create();
+                _serviceCommunicationListeners.Add(listener);
+                listeners.Add(new ServiceReplicaListener(context => listener, listener.EndpointName));
+            }
+
+            return listeners;
+        }
+
+        protected override async Task RunAsync(CancellationToken cancellationToken)
+        {
+            await base.RunAsync(cancellationToken);
+
+            foreach (var listener in _serviceCommunicationListeners)
+            {
+                await listener.RunAsync(cancellationToken);
+            }
         }
     }
 }

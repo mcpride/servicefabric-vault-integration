@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Extensions.Options;
-using Microsoft.ServiceFabric.Data.Collections;
 using Moq;
 using ServiceFabric.Mocks;
-using VaultService.Extensions;
 using VaultService.S3.Model;
 using VaultService.S3.Storage;
 using Xbehave;
@@ -16,9 +13,7 @@ namespace VaultService.UnitTests.Units.ServiceFabricStorage
     public class DeleteObjectAsyncFeature
     {
         private const string S3EntriesKey = "S3:Entries";
-        private const string S3ContentsKey = "S3:Contents";
         private const string BucketId = "my-test-bucket";
-        private const char PathDelimiter = '/';
         private MockReliableStateManager _stateManager;
         private IS3Storage _storage;
 
@@ -42,8 +37,8 @@ namespace VaultService.UnitTests.Units.ServiceFabricStorage
 
         [Scenario(DisplayName = "Remove previously saved S3 object")]
         [Example("rootpath/middlepath/childpath")]
-        //[Example("rootpath/middlepath")]
-        //[Example("rootpath")]
+        [Example("rootpath/middlepath")]
+        [Example("rootpath")]
         public void Remove_previously_saved_S3_object(string s3ObjectKey, S3Object s3Object = null)
         {
             "And a S3 Object with given key is saved"

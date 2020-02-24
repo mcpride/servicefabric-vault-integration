@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace VaultService.Extensions
+namespace VaultService.Core.Extensions
 {
     public static class DelimitedStringExtensionMethods
     {
@@ -18,15 +18,15 @@ namespace VaultService.Extensions
         public static string EnsureTrailingDelimiter(this string value, char delimiter)
         {
             if (string.IsNullOrEmpty(value)) return $"{delimiter}";
-            var c = value[value.Length - 1];
+            var c = value[^1];
             return c == delimiter ? value : $"{value}{delimiter}";
         }
 
         public static string RemoveTrailingDelimiter(this string value, char delimiter)
         {
             if (string.IsNullOrEmpty(value)) return value;
-            var c = value[value.Length - 1];
-            return c != delimiter ? value : value.Substring(0, value.Length - 1);
+            var c = value[^1];
+            return c != delimiter ? value : value[0..^1];
         }
 
         public static string ParentDelimitedBy(this string value, char delimiter)

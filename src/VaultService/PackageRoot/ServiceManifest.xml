@@ -12,7 +12,8 @@
     <EntryPoint>
       <ExeHost>
         <Program>VaultService.exe</Program>
-        <WorkingFolder>CodePackage</WorkingFolder>
+        <WorkingFolder>CodeBase</WorkingFolder>
+        <ConsoleRedirection FileRetentionCount="5" FileMaxSizeInKb="2048"/>
       </ExeHost>
     </EntryPoint>
     <EnvironmentVariables>

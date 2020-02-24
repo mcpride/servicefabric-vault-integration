@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
-using VaultService.Extensions;
+using VaultService.Core.Extensions;
 using VaultService.S3.Model;
 using VaultService.S3.Responses;
 

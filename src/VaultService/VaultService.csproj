@@ -13,13 +13,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.4.658" />
+    <None Remove="Vault.exe" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="S3\Controllers\" />
-    <Folder Include="S3\" />
+    <Content Include="Vault.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.4.658" />
+  </ItemGroup>
 
 </Project>

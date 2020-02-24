@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.ServiceFabric.Data.Collections;
 using Moq;
 using ServiceFabric.Mocks;
-using VaultService.Extensions;
+using VaultService.Core.Extensions;
 using VaultService.S3.Model;
 using VaultService.S3.Storage;
 using Xbehave;

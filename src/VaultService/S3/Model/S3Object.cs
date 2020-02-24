@@ -1,5 +1,5 @@
 ﻿using System;
-using VaultService.Extensions;
+using VaultService.Core.Extensions;
 
 namespace VaultService.S3.Model
 {

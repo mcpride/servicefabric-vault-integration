@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 #pragma warning disable SCS0006 // Weak hashing function
-namespace VaultService.Extensions
+namespace VaultService.Core.Extensions
 {
     public static class StreamExtensionsMethods
     {

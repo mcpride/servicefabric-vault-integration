@@ -275,3 +275,4 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+/src/VaultService/Vault.exe
