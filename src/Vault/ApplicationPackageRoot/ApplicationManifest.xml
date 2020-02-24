@@ -6,9 +6,6 @@
     <Parameter Name="VaultService_PartitionCount" DefaultValue="1" />
     <Parameter Name="VaultService_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
-  <!-- Importieren Sie das "ServiceManifest" aus dem "ServicePackage". Der "ServiceManifestName" und die "ServiceManifestVersion" 
-       sollten mit den Attributen "Name" und "Version" des ServiceManifest-Elements übereinstimmen, die 
-       in der Datei "ServiceManifest.xml" definiert werden. -->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="VaultServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
@@ -17,14 +14,11 @@
     </EnvironmentOverrides>
   </ServiceManifestImport>
   <DefaultServices>
-    <!-- Der Abschnitt unten erstellt Instanzen von Diensttypen, wenn eine Instanz dieses 
-       Anwendungstyps erstellt wird. Sie können auch mindestens eine Instanz von Diensttyp mithilfe des 
-       ServiceFabric-PowerShell-Moduls erstellen. 
-        
-       Das unten aufgeführte Attribut "ServiceTypeName" muss mit dem Namen übereinstimmen, der in der importierten Datei "ServiceManifest.xml"  definiert wird. -->
     <Service Name="VaultService" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="VaultServiceType" TargetReplicaSetSize="[VaultService_TargetReplicaSetSize]" MinReplicaSetSize="[VaultService_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[VaultService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+        <NamedPartition>
+          <Partition Name="vault" />
+        </NamedPartition>
       </StatefulService>
     </Service>
   </DefaultServices>
