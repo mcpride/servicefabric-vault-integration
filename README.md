@@ -32,7 +32,7 @@ This project is just an very basic example - it works - but *IT IS NOT READY FOR
 ### Why Microsoft Service Fabric?
 
 If you have project requirements like high availability, scalability, independency (development, build, deployment) etc. then the microservice approach might be a solution.
-There are a lot of orchestrators for microservices but most of them are more or less strongly tied to linux as os and docker/ kybernate as platform. 
+There are a lot of orchestrators for microservices but most of them are more or less strongly tied to linux as os and docker/ kubernetes as platform. 
 But what if cloud deployment is just an option and on-premises deployability is required but your customer is not prepared for a linux and docker infrastructure? 
 Here comes the outsider Microsoft Service Fabric into play which can be hosted on Linux or Windows, in the (Azure) cloud or locally and can handle docker services but can also manage pure processes.   
 
@@ -44,7 +44,7 @@ Service Fabric manages it's own strategies for high availability and statefulnes
 
 ### The challenge: Use vault with Service Fabric's HA features
 
-This project provides a Service Fabric stateful service with one named partition, which configures, starts and stops the vault tool as an external process. It also provides a partial AWS S3 web interface, which will be configured as vaults storage stanza. The service then stores the received encrypted values from vault into Service Fabric's reliable dictionaries and also handles queries and deletions over it.
+This project provides a Service Fabric stateful service with one named partition, which configures, starts, stops and monitors the vault tool as an external process. It also provides a partial AWS S3 web interface, which will be configured as vaults storage stanza. The service then stores the received encrypted values from vault into Service Fabric's reliable dictionaries and also handles queries and deletions over it.
 
 ## ToDos
 
@@ -52,13 +52,13 @@ This project provides a Service Fabric stateful service with one named partition
 * Add integration tests
 * Implement consistent error handling
 * Extend documentation
-* Add build build script's
-* Add automatic builds
-* improve security
+* Add build script's
+* Add automated builds
+* Improve security
   * SSL/TLS encryption
-  * manage authentication / authorizaion for local S3 web interface
+  * Manage authentication / authorizaion for local S3 web interface
 * Auto-initialize, unseal and bootstrap vault
-* Refactor code (use options etc.)
+* Refactor code (e.g. use options for configuration etc.)
 
 ## Credits
 
