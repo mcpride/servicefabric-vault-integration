@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Core.Enrichers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Fabric;
+using System.IO;
 using VaultService.Core;
 using VaultService.S3.Model;
 using VaultService.S3.Responses;
@@ -30,12 +34,13 @@ namespace VaultService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ConfigureLogging(services, _serviceContext);
+
             services.AddControllers();
 
             services
                 .AddTransient<IServiceCommunicationListenerFactory, VaultCommunicationListenerFactory>()
                 .AddSingleton<IS3Storage, ServiceFabricStorage>()
-                .AddTransient(provider => new Lazy<IS3Storage>(provider.GetRequiredService<IS3Storage>()))
                 .AddSingleton(BuildResponder());
         }
 
@@ -70,6 +75,33 @@ namespace VaultService
 
             IS3Responder s3Responder = new S3XmlResponder(s3Serializers);
             return s3Responder;
+        }
+
+        private static void ConfigureLogging(IServiceCollection services, ServiceContext serviceContext)
+        {
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.File(Path.Combine(serviceContext.CodePackageActivationContext.LogDirectory, "vaultservice.log"),
+                    fileSizeLimitBytes: 1_000_000,
+                    rollOnFileSizeLimit: true,
+                    retainedFileCountLimit: 10,
+                    shared: true,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] ({SourceContext}) {Message:lj}{NewLine}{Exception}",
+                    flushToDiskInterval: TimeSpan.FromSeconds(1))
+                .CreateLogger();
+
+            var properties = new[]
+            {
+                new PropertyEnricher("ServiceTypeName", serviceContext.ServiceTypeName),
+                new PropertyEnricher("ServiceName", serviceContext.ServiceName),
+                new PropertyEnricher("PartitionId", serviceContext.PartitionId),
+                new PropertyEnricher("InstanceId", serviceContext.ReplicaOrInstanceId),
+                new PropertyEnricher("ProcessId", Process.GetCurrentProcess().Id)
+            };
+
+            services.AddLogging(loggingBuilder
+                => loggingBuilder
+                    .AddSerilog(Log.Logger.ForContext(properties), true));
         }
     }
 }

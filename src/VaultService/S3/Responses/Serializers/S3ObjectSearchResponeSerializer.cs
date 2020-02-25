@@ -14,7 +14,7 @@ namespace VaultService.S3.Responses.Serializers
                     list.Name(searchResponse.BucketName);
                     list.Prefix(searchResponse.Prefix);
                     list.Marker(searchResponse.Marker);
-                    list.MaxKeys(searchResponse.MaxKeys);
+                    list.MaxKeys(searchResponse.MaxKeys.HasValue ? searchResponse.MaxKeys.Value : int.MaxValue);
                     list.IsTruncated(XmlConvert.ToString(searchResponse.IsTruncated));
                     foreach (var s3Object in searchResponse.S3Objects)
                     {

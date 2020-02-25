@@ -16,11 +16,11 @@ namespace VaultService.S3.Controllers
     [ApiController]
     public class S3Controller : ControllerBase
     {
-        private readonly Lazy<IS3Storage> _storage;
+        private readonly IS3Storage _storage;
         private readonly IS3Responder _responder;
         private readonly ILogger _logger;
 
-        public S3Controller(Lazy<IS3Storage> storage, IS3Responder responder, ILoggerFactory loggerFactory)
+        public S3Controller(IS3Storage storage, IS3Responder responder, ILoggerFactory loggerFactory)
         {
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
             _responder = responder ?? throw new ArgumentNullException(nameof(responder));
@@ -32,7 +32,7 @@ namespace VaultService.S3.Controllers
         [Route("{bucket}/{*key}")]
         public async Task<ActionResult> Get(string bucket, string key, CancellationToken cancellationToken)
         {
-            var s3Object = await _storage.Value.GetObjectAsync(bucket, key, cancellationToken);
+            var s3Object = await _storage.GetObjectAsync(bucket, key, cancellationToken);
             if (s3Object == null)
             {
                 return NotFound();
@@ -67,7 +67,7 @@ namespace VaultService.S3.Controllers
                 s3Object.Content =  await Request.Body.ReadAllBytesAsync();
             }
 
-            await _storage.Value.AddObjectAsync(s3Object, cancellationToken);
+            await _storage.AddObjectAsync(s3Object, cancellationToken);
 
             var response = Ok();
             Response.Headers.Add("ETag", $"\"{s3Object.ContentMD5}\"");
@@ -78,7 +78,7 @@ namespace VaultService.S3.Controllers
         [Route("{bucket}/{*key}")]
         public async Task<IActionResult> Delete(string bucket, string key, CancellationToken cancellationToken)
         {
-            await _storage.Value.DeleteObjectAsync(bucket, key, cancellationToken);
+            await _storage.DeleteObjectAsync(bucket, key, cancellationToken);
             return NotFound();
         }
 
@@ -86,7 +86,7 @@ namespace VaultService.S3.Controllers
         [Route("{bucket}")]
         public async Task<IActionResult> Head(string bucket, CancellationToken cancellationToken)
         {
-            var bucketObject = await _storage.Value.GetBucketAsync(bucket, cancellationToken);
+            var bucketObject = await _storage.GetBucketAsync(bucket, cancellationToken);
             if (bucketObject != null) return Ok();
             var responseNotFound = _responder.RespondContent(new BucketNotFound { BucketName = bucket });
             responseNotFound.StatusCode = (int)HttpStatusCode.NotFound;
@@ -109,7 +109,7 @@ namespace VaultService.S3.Controllers
         public async Task<IActionResult> Put(string bucket, CancellationToken cancellationToken)
         {
             var newBucket = new Bucket { Id = bucket, CreationDate = DateTime.UtcNow };
-            await _storage.Value.AddBucketAsync(newBucket, cancellationToken);
+            await _storage.AddBucketAsync(newBucket, cancellationToken);
             return Ok();
         }
 
@@ -117,7 +117,7 @@ namespace VaultService.S3.Controllers
         [Route("{bucket}")]
         public async Task<IActionResult> Delete(string bucket, CancellationToken cancellationToken)
         {
-            await _storage.Value.DeleteBucketAsync(bucket, cancellationToken);
+            await _storage.DeleteBucketAsync(bucket, cancellationToken);
             return NoContent();
         }
 
@@ -129,7 +129,7 @@ namespace VaultService.S3.Controllers
             {
                 var serializer = new XmlSerializer(typeof(DeleteRequest));
                 var deleteRequest = (DeleteRequest)serializer.Deserialize(Request.Body);
-                await _storage.Value.DeleteObjectAsync(bucket, deleteRequest.Object.Key, cancellationToken);
+                await _storage.DeleteObjectAsync(bucket, deleteRequest.Object.Key, cancellationToken);
                 return _responder.RespondContent(deleteRequest);
             }
             return NoContent();
@@ -138,13 +138,13 @@ namespace VaultService.S3.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
-            var bucketList = await _storage.Value.ListBucketsAsync(cancellationToken);
+            var bucketList = await _storage.ListBucketsAsync(cancellationToken);
             return _responder.RespondContent(bucketList);
         }
 
         private async Task<IActionResult> ListObjectsAsync(string bucket, CancellationToken cancellationToken)
         {
-            var bucketObject = await _storage.Value.GetBucketAsync(bucket, cancellationToken);
+            var bucketObject = await _storage.GetBucketAsync(bucket, cancellationToken);
             if (bucketObject == null)
             {
                 var responseNotFound = _responder.RespondContent(new BucketNotFound { BucketName = bucket });
@@ -160,7 +160,7 @@ namespace VaultService.S3.Controllers
                 Marker = Request.Query.ContainsKey("marker") ? Request.Query["marker"][0] : string.Empty,
             };
 
-            var searchResponse = await _storage.Value.SearchObjectsAsync(searchRequest, cancellationToken);
+            var searchResponse = await _storage.SearchObjectsAsync(searchRequest, cancellationToken);
             var response = _responder.RespondContent(searchResponse);
 #if DEBUG
             if (_logger.IsEnabled(LogLevel.Information))
