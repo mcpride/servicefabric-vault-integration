@@ -54,6 +54,7 @@ This project provides a Service Fabric stateful service with one named partition
 * Extend documentation
 * Add build script's
 * Add automated builds
+* Add linux compatibility
 * Improve security
   * SSL/TLS encryption
   * Manage authentication / authorizaion for local S3 web interface

@@ -88,8 +88,6 @@ namespace VaultService.Vault
         {
             await _s3Storage.AddBucketAsync(new Bucket { Id = "vaultbucket", CreationDate = DateTime.UtcNow }, cancellationToken);
 
-            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-
             if (! await StartProcess(cancellationToken))
             {
                 var process = _process;
