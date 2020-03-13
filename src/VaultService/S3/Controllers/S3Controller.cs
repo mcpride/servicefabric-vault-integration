@@ -79,7 +79,7 @@ namespace VaultService.S3.Controllers
         public async Task<IActionResult> Delete(string bucket, string key, CancellationToken cancellationToken)
         {
             await _storage.DeleteObjectAsync(bucket, key, cancellationToken);
-            return NotFound();
+            return NoContent();
         }
 
         [HttpHead]
