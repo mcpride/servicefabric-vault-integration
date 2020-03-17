@@ -6,7 +6,7 @@ Integrates Hashicorp's Vault into Microsoft Service Fabric, e.g. for on-prem sce
 
 ## Hint
 
-This project is just an very basic example - it works - but *IT IS NOT READY FOR PRODUCTION USE*! No waranties! Sorry for this, but I don't have much spare time.
+This project is just a very basic example - it works - but *IT IS NOT READY FOR PRODUCTION USE*! No waranties! Sorry for this, but I don't have much spare time.
 
 ## Getting Started
 
@@ -36,11 +36,14 @@ There are a lot of orchestrators for microservices but most of them are more or 
 But what if cloud deployment is just an option and on-premises deployability is required but your customer is not prepared for a linux and docker infrastructure? 
 Here comes the outsider Microsoft Service Fabric into play which can be hosted on Linux or Windows, in the (Azure) cloud or locally and can handle docker services but can also manage pure processes.   
 
-### Why HashiCorp's Vault
+### Why HashiCorp's Vault?
 
 Azure ServiceFabric has a rich tooling for cloud scenarios but just poor support for on-premises deployments - e.g. the key manager Azure KeyVault isn't available there. The independent tool "Vault" - available for diverse platforms - can fill such gaps because it is the "swiss army-knife" (in german: "eierlegende Wollmilchsau" ) for configuration, secrets and key management.
+
+### But ...
+
 Vault has a lot of storage providers - some of them are enabled fo HA. Some of them are lesser stable e.g. the mssql provider makes heavy usage of inefficient "like" based search queries.
-Service Fabric manages it's own strategies for high availability and statefulness which doesn't integrate very well with vault's possibilities.
+Service Fabric manages it's own strategies for high availability and statefulness - unfortunately vault's possibilities doesn't integrate very well with Service Fabric.
 
 ### The challenge: Use vault with Service Fabric's HA features
 
@@ -64,6 +67,7 @@ This project provides a Service Fabric stateful service with one named partition
 ## Credits
 
 This project uses some ideas and source code from [Gokhan Demir's (yadazula) S3Emulator project](https://github.com/yadazula/S3Emulator.git)
+Credits also goes to Hashicorp for the vault tool and to Microsoft for the Service Fabric orchestration environment and all the programming tools around.
 
 ## License
 
